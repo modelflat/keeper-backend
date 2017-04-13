@@ -1,0 +1,23 @@
+{
+  "name": "keeper-backend",
+  "version": "1.0.0",
+  "description": "keeper-backend",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yaphtes/keeper-backend.git"
+  },
+  "author": "yaphtes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yaphtes/keeper-backend/issues"
+  },
+  "homepage": "https://github.com/yaphtes/keeper-backend#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}
