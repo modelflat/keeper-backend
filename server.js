@@ -1,4 +1,5 @@
 const express = require('express');
+const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 const formidable = require('formidable');
 const app = express();
@@ -17,4 +18,5 @@ app.all('*', (req, res) => {
 
 app.listen(app.get('port'), () => {
     console.info('server started');
+    module.exports = app;
 });

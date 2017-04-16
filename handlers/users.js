@@ -1,6 +1,9 @@
+const app = require('../server');
+
 exports.postUser = function (req, res) {
-    // TODO: ..
     let newUser = req.body;
+    console.log(newUser);
+    console.log(app.get('port'));
 
     res.sendStatus(200);
 };
