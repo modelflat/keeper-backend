@@ -1,7 +1,8 @@
-const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+const credentials = require('./credentials');
 const bodyParser = require('body-parser');
 const formidable = require('formidable');
+const express = require('express');
 const app = express();
 
 app.set('port', 3000);
@@ -9,14 +10,9 @@ app.set('port', 3000);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-require('./routes')(app);
 
-
-app.all('*', (req, res) => {
-    res.sendStatus(500);
-});
-
-app.listen(app.get('port'), () => {
-    console.info('server started');
-    module.exports = app;
+MongoClient.connect(credentials.mongo, (err, database) => {
+    if (err) console.error(err);
+    require('./routes')(app, database);
+    app.listen(app.get('port'), () => console.log('server started'));
 });
