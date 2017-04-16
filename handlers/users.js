@@ -14,12 +14,6 @@ exports.getUser = function (app, db) {
     };
 };
 
-exports.getUsers = function (app, db) {
-    return function (req, res) {
-        res.send();
-    };
-};
-
 exports.postUser = function (app, db) {
     return function (req, res) {
         const { username, password } = req.body;
@@ -44,8 +38,9 @@ exports.postUser = function (app, db) {
 
         function applyJWT(user) {
             let token = jwt.sign({
-                id: user._id
-            }, credentials.jwtSecret, { expiresIn: credentials.expiresUserToken });
+                id: user._id,
+                exp: credentials.tokenExpires
+            }, credentials.jwtSecret);
 
             user.token = token
 
@@ -75,12 +70,14 @@ exports.postUser = function (app, db) {
 
 exports.checkToken = function (app, db) {
     return function (req, res, next) {
+        let { token } = req.query;
         let tokenIsAlived = false;
 
-        // TODO: ..
-        jwt.verify(req.query.token, credentials.jwtSecret, {
+        if (!token) return next();
 
-        })
-        next();
+        jwt.verify(req.query.token, credentials.jwtSecret, (err, decoded) => {
+            if (err) return res.status(401).send(err.message);
+            next();
+        });
     };
 }
