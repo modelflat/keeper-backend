@@ -1,11 +1,24 @@
 const credentials = require('../credentials');
 const jwt = require('jsonwebtoken');
 
+exports.login = function (app, db) {
+    return function (req, res) {
+        const { username, password } = req.query;
+
+        db.collection('users').findOne({ username, password })
+            .then(user => {
+                if (!user) return res.status(404).send('User not found');
+                res.status(200).send(user)
+            })
+            .catch(console.error);
+    };
+};
+
 exports.getUser = function (app, db) {
     return function (req, res) {
-        const user = req.query;
+        const { token } = req.query;
 
-        db.collection('users').findOne(user)
+        db.collection('users').findOne({ token })
             .then(user => {
                 if (!user) return res.status(404).send('User not found');
                 res.status(200).send(user)

@@ -6,6 +6,7 @@ module.exports = function (app, db) {
     app.use(users.checkToken(app, db));
 
     // users routes
+    app.get('/login', users.login(app, db));
     app.get('/user', users.getUser(app, db));
     app.post('/user', users.postUser(app, db));
 };
