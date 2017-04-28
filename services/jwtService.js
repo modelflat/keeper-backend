@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const credentials = require('../credentials');
+const ObjectId = require('mongodb').ObjectID;
+
 
 class jwtService {
     static use(user, db) {
@@ -31,7 +33,12 @@ class jwtService {
     }
 
     static getUserId(token) {
-        return jwt.decode(token).id;
+        let decoded = jwt.decode(token);
+        if (decoded) {
+            return ObjectId(jwt.decode(token).id);
+        } else {
+            return null;
+        }
     }
 }
 

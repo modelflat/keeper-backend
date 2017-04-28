@@ -1,6 +1,5 @@
 const dbService = require('../services/dbService');
 const jwtService = require('../services/jwtService');
-const ObjectId = require('mongodb').ObjectID;
 
 class User {
     constructor(props) {
@@ -30,13 +29,17 @@ class User {
     }
 
     static getByToken(token, db) {
-        let id = ObjectId(jwtService.getUserId(token));
+        let id = jwtService.getUserId(token);
 
-        return new Promise((resolve, reject) => {
-            db.collection('users').findOne({ _id: id })
-                .then(resolve)
-                .catch(console.error);
-        })
+        if (id) {
+            return new Promise((resolve, reject) => {
+                db.collection('users').findOne({ _id: id })
+                    .then(resolve)
+                    .catch(console.error);
+            })
+        } else {
+            return Promise.reject('User not found');
+        }
     }
 }
 

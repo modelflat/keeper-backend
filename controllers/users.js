@@ -33,7 +33,7 @@ exports.login = function (app, db) {
                 res.status(500).send(err);
                 console.log('login error:\n', err);
             });
-    }
+    };
 };
 
 exports.getUserByToken = function (app, db) {
@@ -43,8 +43,8 @@ exports.getUserByToken = function (app, db) {
         User.getByToken(token, db)
             .then(user => res.status(200).send(user))
             .catch(err => {
-                res.status(500).send(err);
+                res.status(404).send(err);
                 console.log('getUserByToken error:\n', err);
             });
-    }
+    };
 };
