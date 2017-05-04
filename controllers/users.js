@@ -9,7 +9,7 @@ exports.postUser = function (app, db) {
         User.insertOne(user, db)
             .then(user => res.status(200).send(user))
             .catch(err => {
-                res.status(500).send(err);
+                res.status(400).send(err);
                 console.log('postUser error:\n', err);
             });
     };
@@ -39,6 +39,8 @@ exports.login = function (app, db) {
 exports.getUserByToken = function (app, db) {
     return (req, res) => {
         let token = req.headers.token;
+
+        console.log('Will getUserByToken:\n', token);
 
         User.getByToken(token, db)
             .then(user => res.status(200).send(user))

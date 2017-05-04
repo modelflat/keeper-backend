@@ -18,7 +18,9 @@ class jwtService {
 
     static check(req, res, next) {
         let loginRegexp = /\/user\?username=[.]&password=[.]$/;
-        if (req.method.toLowerCase() == 'post' && req.url == '/user') return next();
+        let registerRegexp = /\/user$/;
+        // todo: улучшить Regexp`ы
+        if (req.method.toLowerCase() == 'post' && registerRegexp.exec(req.url) != -1) return next();
         if (req.method.toLowerCase() == 'get' && loginRegexp.exec(req.url) != -1) return next();
 
         let token = req.headers.token;
