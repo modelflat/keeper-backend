@@ -1,5 +1,23 @@
 const User = require('../models/User');
 
+exports.updateUserProfile = function (app, db) {
+    return (req, res) => {
+        let user = new User(req.body);
+        let _id = user._id;
+
+        console.log('Will updateUserProfile:\n', user._id);
+
+        User.updateProfile(_id, user, db)
+            .then(user => {
+                res.status(200).send(user);
+            })
+            .catch(err => {
+                res.status(500).send(err);
+                console.log('updateUserProfile error:\n', err);
+            });
+    };
+}
+
 exports.postUser = function (app, db) {
     return (req, res) => {
         let user = new User(req.body);
@@ -18,10 +36,12 @@ exports.postUser = function (app, db) {
 exports.login = function (app, db) {
     return (req, res) => {
         let user = new User(req.query);
+        let type = req.query.type;
 
         console.log('Will login:\n', user);
+        console.log('Will login type:\n', type);
 
-        User.findOne(user, db)
+        User.login(type, user, db)
             .then(user => {
                 if (!user) {
                     res.status(404).send();

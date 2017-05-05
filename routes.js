@@ -10,4 +10,5 @@ module.exports = function (app, db) {
     app.post('/user', users.postUser(app, db));
     app.get('/user', users.login(app, db));
     app.get('/user-by-token', users.getUserByToken(app, db));
+    app.put('/user-profile', users.updateUserProfile(app, db));
 };
