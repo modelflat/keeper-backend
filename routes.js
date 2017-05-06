@@ -1,14 +1,15 @@
-const users = require('./controllers/users');
-const jwtService = require('./services/jwtService');
+const UserController = require('./controller/UserController');
+const JWTService = require('./service/JWTService');
 
 module.exports = function (app, db) {
+    // token verifier
+    app.use("/user/:name", JWTService.check);
 
-    // token
-    app.use(jwtService.check);
-
-    // user routes
-    app.post('/user', users.postUser(app, db));
-    app.get('/user', users.login(app, db));
-    app.get('/user-by-token', users.getUserByToken(app, db));
-    app.put('/user-profile', users.updateUserProfile(app, db));
+    // common routes
+    app.get('/login', UserController.login(app, db));
+    app.post('/register', UserController.register(app, db));
+    
+    // authorized
+    app.get('/user/:name', UserController.getUserProfile(app, db));
+    //app.put('/user/:name', UserController.updateUserProfile(app, db));
 };
