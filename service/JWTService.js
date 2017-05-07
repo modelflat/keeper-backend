@@ -16,6 +16,7 @@ class JWTService {
         let token = req.body.token || req.query.token;
         if (!token) {
             res.status(401).send({error : "jwt not provided"});
+            return;
         }
         var invalid = true;
         try {
