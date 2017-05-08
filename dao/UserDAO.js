@@ -6,25 +6,6 @@ class UserDAO {
     // TODO: back in Java/C++/etc, we could store some useful information in DAOs.
     // probably class shouldn't be full-static?
     
-    static updateUser(oldUsername, updatedUser, db) {
-        return new Promise((resolve, reject) => {
-            db.collection(collectionName).findOneAndUpdate(
-                { name: oldUsername }, {
-                    // TODO check this query
-                    $set: { name: updatedUser.name, passHash: updatedUser.passHash, email: updatedUser.email }
-                }
-            ).then(document => {
-                console.log('profile updated:\n', document);
-                // everything's alright
-                resolve(new User(document));
-            })
-            // if we fail to update, then there are two possible problems:
-            // 1) connection error, server down, etc.
-            // 2) failing to satisfy unique constraints either on username or on email
-            .catch(reject);
-        });
-    }
-
     // adds new user 
     static addNewUser(user, db) {
         // returning new promise just to encapsulate DAL logic
@@ -36,18 +17,15 @@ class UserDAO {
     }
 
     // retrieves user either by email or by name
-    static getUser(type, emailOrName, db) {
+    static findUser(name, email, db) {
         var query;
         
-        switch (type) {
-            case "name":
-                query = {name : emailOrName} 
-                break;
-            case "email":
-                query = {email : emailOrName}
-                break;
-            default:
-                return Promise.reject('invalid login type');
+        if (name) {
+            query = {username : name} 
+        } else if (email) {
+            query = {email : email}
+        } else {
+            return Promise.reject('invalid login type');
         }
         
         return new Promise((resolve, reject) => {
@@ -57,10 +35,37 @@ class UserDAO {
                     if (document) {
                         resolve(new User(document));
                     } else {
-                        reject("no user with " + type + "=" + emailOrName);
+                        reject("no user with such name or email");
                     }
                 })
+                // something went wrong
                 .catch(console.error);
+        });
+    }
+
+    static updateUser(oldUsername, updatedUser, db) {
+        return new Promise((resolve, reject) => {
+            db.collection(collectionName).findOneAndUpdate(
+                { username: oldUsername }, {
+                    $set: { 
+                        username: updatedUser.username, 
+                        password: updatedUser.password, 
+                        email: updatedUser.email
+                    }
+                }, {projection: {_id: 0, password: 0}, returnNewDocument: 1}
+            ).then(document => {
+                if (document.value) {
+                    // everything's alright
+                    console.log(document);
+                    resolve(new User(document.value));
+                } else {
+                    reject("cannot update user " + oldUsername);
+                }
+            })
+            // if we fail to update, then there are two possible problems:
+            // 1) connection error, server down, etc.
+            // 2) failing to satisfy unique constraints either on username or on email
+            .catch(reject);
         });
     }
 }

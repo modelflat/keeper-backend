@@ -1,14 +1,18 @@
 class User {
     constructor(props) {
-        this.name = props.name;
-        this.passHash = props.passHash;
+        this.username = props.username;
+        this.password = props.password || props.passHash;
         this.email = props.email || '';
         this.ui = props.ui || {};
         this.cards = props.cards || [];
     }
     
-    static fromBody(name, passHash, email) {
-        return new User({name: name, passHash: passHash, email: email});
+    // removes the "password" field
+    // TODO figure out how to exclude it in more convenient way (probably post-processing middleware?)
+    toResponse() {
+        let u = new User(this);
+        u.password = undefined;
+        return u;
     }
 }
 

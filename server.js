@@ -28,8 +28,8 @@ MongoClient.connect(credentials.mongo, (err, database) => {
             database.collection(usersCollectionName).createIndexes(
                 [{key : {name: 1}, unique: 1}, {key : {email: 1}, unique: 1}]
             ),
-            database.collection(sessionsCollectionName).createIndex(
-                {created: 1}, {expireAfterSeconds: 3600*24*7}
+            database.collection(sessionsCollectionName).createIndexes(
+                [{key: {created: 1}, expireAfterSeconds: 3600*24*7}, {key: {jwt: 1}}]
             )
         ])
         // if indices already exist, then nothing happens
