@@ -21,6 +21,31 @@ module.exports.registrationValidator =(req, res, next) => {
     res.status(400).send({error: "Wrong register request parameters"});
 }
 
+module.exports.userUpdateValidator = (req, res, next) => {
+    if (req.method.toLowerCase() === "post") {
+        var infoToUpdate = {};
+        
+        if (validateUsername(req.body.username)) {
+            infoToUpdate.username = req.body.username;
+        }
+        
+        if (validateEmail(req.body.email)) {
+            infoToUpdate.email = req.body.email;
+        }
+        
+        if (validatePassword(req.body.password)) {
+            infoToUpdate.password = hashAndSaltPassword(req.body.password, createSalt());
+        }
+        
+        if (infoToUpdate) {
+            req.infoToUpdate = infoToUpdate;
+            next();
+            return;
+        }
+    }
+    res.status(400).send({error: "invalid arguments"});
+}
+
 // sample username validation
 function validateUsername(name) {
     return name && name.length >= 3;

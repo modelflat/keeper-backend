@@ -6,7 +6,7 @@ const validateUsername = require("../Util").validateUsername;
 class JWTService {
 
     static sign(user) {
-        let token = jwt.sign({name : user.username}, credentials.jwtSecret, { expiresIn: '7d' });
+        return jwt.sign({name : user.username}, credentials.jwtSecret, { expiresIn: '7d' });
     }
     
     static verify(token) {
@@ -14,14 +14,14 @@ class JWTService {
     }
 
     // TODO use app.param for token validation
-    static check(req, res, next) {
+    static validateJWT(req, res, next) {
         if (!validateUsername(req.params.name)) {
             res.status(400).send({error: "invalid username"});
             return;
         }
         
-        // NOTE: we try both body and query params, just for convenience
-        let token = req.body.token || req.query.token;
+        // NOTE: we try body, query and headers params, just for convenience
+        let token = req.body.token || req.query.token || req.headers.jwt;
         if (!token) {
             res.status(401).send({error : "jwt not provided"});
             return;
@@ -36,9 +36,6 @@ class JWTService {
         } catch (err) {
             invalid = err;
         }
-        
-        // last step: check if token present in sessions
-        SessionDAO.findSession(token, db)
         
         if (invalid) {
             res.status(401).send({error : invalid.message || "jwt is invalid"});

@@ -10,6 +10,9 @@ module.exports.usersCollectionName = usersCollectionName;
 const sessionsCollectionName = "sessions";
 module.exports.sessionsCollectionName = sessionsCollectionName;
 
+const UserDAO = require("./dao/UserDAO");
+const SessionDAO = require("./dao/SessionDAO");
+
 app.set('port', 3000);
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -38,8 +41,11 @@ MongoClient.connect(credentials.mongo, (err, database) => {
             console.error(err);
             return;
         });
+        
+    app.locals.userDAO = new UserDAO(database);
+    app.locals.sessionDAO = new SessionDAO(database);
     
-    require('./routes')(app, database);
+    require('./routes')(app);
     
     app.listen(app.get('port'), () => console.log('server started'));
 });

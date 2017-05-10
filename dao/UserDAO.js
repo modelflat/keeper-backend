@@ -4,20 +4,24 @@ const collectionName =require("../server").usersCollectionName;
 class UserDAO {
     
     // TODO: back in Java/C++/etc, we could store some useful information in DAOs.
-    // probably class shouldn't be full-static?
+    // probably class shouldn't be full-static? UPD: yeah
+    
+    constructor(db) {
+        this.db = db;
+    }
     
     // adds new user 
-    static addNewUser(user, db) {
+    addNewUser(user) {
         // returning new promise just to encapsulate DAL logic
         return new Promise((resolve, reject) => {
-            db.collection(collectionName).insertOne(user)
+            this.db.collection(collectionName).insertOne(user)
                 .then(doc => resolve(user))
                 .catch(err => reject("User with such name/email already exists!"));
         });
     }
 
     // retrieves user either by email or by name
-    static findUser(name, email, db) {
+    findUser(name, email) {
         var query;
         
         if (name) {
@@ -29,7 +33,7 @@ class UserDAO {
         }
         
         return new Promise((resolve, reject) => {
-            db.collection(collectionName).findOne(query)
+            this.db.collection(collectionName).findOne(query)
                 .then(document => {
                     // OK, creating user object
                     if (document) {
@@ -43,23 +47,16 @@ class UserDAO {
         });
     }
 
-    static updateUser(oldUsername, updatedUser, db) {
+    updateUser(oldUsername, updatedUser) {
         return new Promise((resolve, reject) => {
-            db.collection(collectionName).findOneAndUpdate(
-                { username: oldUsername }, {
-                    $set: { 
-                        username: updatedUser.username, 
-                        password: updatedUser.password, 
-                        email: updatedUser.email
-                    }
-                }, {projection: {_id: 0, password: 0}, returnNewDocument: 1}
+            this.db.collection(collectionName).findOneAndUpdate(
+                { username: oldUsername }, { $set: updatedUser }, {projection: {_id: 0}, returnNewDocument: 1}
             ).then(document => {
                 if (document.value) {
                     // everything's alright
-                    console.log(document);
                     resolve(new User(document.value));
                 } else {
-                    reject("cannot update user " + oldUsername);
+                    reject("cannot update user " + oldUsername + "; user not found!");
                 }
             })
             // if we fail to update, then there are two possible problems:

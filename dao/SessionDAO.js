@@ -1,4 +1,4 @@
-const collectionName = require("../server").sessionCollectionName;
+const collectionName = require("../server").sessionsCollectionName;
 
 class SessionDAO {
     
@@ -7,24 +7,34 @@ class SessionDAO {
     // UPD: looks like JWT has all the functionality SessionDAO was implemented for!
     // UPD2: ...except for session ending
     
+    constructor(db) {
+        this.db = db;
+    }
+    
     // initiate new session
-    static startSession(username, jwt, db) {
-        return db.collection(collectionName).insertOne(
+    startSession(username, jwt) {
+        return this.db.collection(collectionName).insertOne(
                 {jwt: jwt, created: Date.now(), name: username}
         );
     }
     
     // lookup for existing session by jwt
-    static findSession(jwt, db) {
-        return db.collection(collectionName).findOne(
+    findSession(jwt) {
+        return this.db.collection(collectionName).findOne(
             {jwt: jwt}
         );
     }
     
     // end session by jwt
-    static endSession(jwt, db) {
-        return db.collection(collectionName).deleteOne(
+    endSession(jwt) {
+        return this.db.collection(collectionName).deleteOne(
             {jwt: jwt}
+        );
+    }
+    
+    endSessionsForUser(username) {
+        return this.db.collection(collectionName).deleteMany(
+            {name: username}
         );
     }
     
